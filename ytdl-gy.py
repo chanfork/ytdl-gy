@@ -32,12 +32,12 @@ class CmdArgs(object):
                             help='the target url')
         parser.add_argument('--dry', action='store_true',
                             dest='dry_run',
-                            help='show data summarize and DL prohibited')
+                            help='show target-info only')
         parser.add_argument('--save-meta', action='store_true',
-                            help='save data summarize to file')     
+                            help='save target-info and thumbnail to file')     
         parser.add_argument('--mode', default='current', type=str,
                             choices=['all', 'current'],
-                            help='process play_list or current url')      
+                            help='work on playlist or current url')      
         parser.add_argument('--version', action='version', version='%(prog)s 0.2.0')
         return parser
     
