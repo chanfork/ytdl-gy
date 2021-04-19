@@ -9,14 +9,15 @@ RUN apt-get update && \
 	ssh \
 	supervisor \
 	ffmpeg \
+	tmux \
+	rsync \
     nano && \
     apt-get clean
-	
-COPY requirements.txt Dockerfile /var/
+
+COPY requirements.txt /var/
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /var/requirements.txt 
 	
 #ENTRYPOINT 	
-#CMD bash /home/pysaweb/init.sh	
-#CMD ["/bin/bash","--login","-c","bash"]
-CMD ["/bin/bash","-c","bash"]
+
+CMD ["/bin/bash","-c","git clone https://github.com/chanfork/ytdl-gy.git /home/ytdl-gy && cd /home/ytdl-gy && bash"]
