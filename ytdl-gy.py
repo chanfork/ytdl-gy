@@ -165,7 +165,7 @@ class VideoDataS1(object):
                 
     @property 
     def find_playlist_urls(self):
-        playlist = self.bs_html.find('ul',id='playlist')
+        playlist = self.bs_html.find('div',{"class":"tab-pane fade in active clearfix"})
         assert playlist, 'Could not find playlist' 
         playlist_urls = playlist.find_all('a')
         assert playlist_urls, 'Could not find urls in this playlist'
