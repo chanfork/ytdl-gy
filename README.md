@@ -14,7 +14,8 @@
   pip install -r requirements.txt
   ```
 
-<p style="text-align: center;">OR</p>
+OR
+
 - Use `Dockerfile`  :
 
   ```bash
@@ -24,7 +25,6 @@
   # user should mount a local EMPTY directory to /home/ytdl-gy, so the source code will be installed(clone) into it.
   ```
 
-  
 
 ## Usage
 
@@ -36,3 +36,5 @@
   'v.com/ep'
   'm/video/'
   ```
+  
+  
