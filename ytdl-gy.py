@@ -55,29 +55,29 @@ class CmdArgs(object):
         return test_args   
 
 #########################################################
+headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'}    
 
 def get_bs_html(url):
-    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'}    
     req = requests.get(url,headers=headers)
     html = bs(req.text, 'lxml')
     #print(html.prettify())
     return html
 
 def get_m3u8_luanch_url(m3u8_url):
-    with urllib.request.urlopen(m3u8_url) as response:
+    req = urllib.request.Request(m3u8_url,headers=headers)    
+    with urllib.request.urlopen(req) as response:
        m3u8 = response.read().decode('utf8').split('\n')
        m3u8_contents_url = m3u8[2] # last line
     m3u8_domain_name = '/'.join(m3u8_url.split('/')[0:3])  
     m3u8_luanch_url = m3u8_url if m3u8_contents_url.endswith('.m3u8') or len(m3u8) > 4 else m3u8_domain_name+m3u8_contents_url    
     return m3u8_luanch_url
 
-def get_m3u8_vresolution(m3u8_url):  
-    with urllib.request.urlopen(m3u8_url) as response:
+def get_m3u8_vresolution(m3u8_url):
+    req = urllib.request.Request(m3u8_url,headers=headers)       
+    with urllib.request.urlopen(req) as response:
        m3u8 = response.read().decode('utf8').split('\n')
        m3u8_vresolution = m3u8[1].split(',')[-1].replace('RESOLUTION=','') if 'RESOLUTION=' in m3u8[1] else ''  
     return m3u8_vresolution
-
-###########################################################
     
 def get_dl_directory(video_data_summarize,creat=False):
     dl_directory = os.path.join(os.getcwd(),video_data_summarize['title'])
@@ -88,7 +88,7 @@ def call_ytdl_do_job(url, save_directory, file_name='default', ytdl_path=os.path
     # see https://github.com/ytdl-org/youtube-dl#output-template
     file_name = file_name+'.%(ext)s' if file_name != 'default' else '%(title)s-%(id)s.%(ext)s'        
     ytdl_path = 'youtube-dl' if sys.platform.startswith('linux') else ytdl_path        
-    cmd = [ytdl_path, '-o', file_name, url]
+    cmd = [ytdl_path, '--user-agent', headers['User-Agent'], '-o', file_name, url]
     sp.run(cmd, cwd=save_directory, text=True,
            stdout=sys.stdout)
 
@@ -96,7 +96,6 @@ def dl_img(imgurl, save_directory):
     if imgurl == '': return
     file_name = imgurl.split('/')[-1]
     file_path = os.path.join(save_directory,file_name)
-    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'}   
     req = urllib.request.Request(imgurl,headers=headers)
     with urllib.request.urlopen(req) as response:
         img = response.read()      
