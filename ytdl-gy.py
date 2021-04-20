@@ -150,7 +150,7 @@ class VideoDataS1(object):
         vmeta['title'] = self.bs_html.find('title').text.strip().split(' ')[0]
         vmeta['title_ep'] = self.bs_html.find('title').text
         vmeta['img_url'] = self.bs_html.find("meta", property="og:image")['content'] if self.bs_html.find("meta", property="og:image") else ''
-        vmeta['info'] = self.bs_html.find("meta", attrs={'name': 'description'})['content'] if self.bs_html.find("meta", attrs={'name': 'description'}) else ''
+        vmeta['info'] = self.bs_html.find("span",{"class":"sketch content"}).text.strip() if self.bs_html.find("span",{"class":"sketch content"}) else ''
         return vmeta
     
     @property
