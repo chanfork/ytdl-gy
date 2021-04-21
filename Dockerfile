@@ -11,6 +11,8 @@ RUN apt-get update && \
 	ffmpeg \
 	tmux \
 	rsync \
+	libxml2-dev \
+	libxslt1-dev \
     nano && \
     apt-get clean
 
@@ -18,6 +20,6 @@ COPY requirements.txt /var/
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /var/requirements.txt 
 	
-#ENTRYPOINT 	
+#ENTRYPOINT
 
 CMD ["/bin/bash","-c","git clone https://github.com/chanfork/ytdl-gy.git /home/ytdl-gy && cd /home/ytdl-gy && bash"]
