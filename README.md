@@ -21,8 +21,7 @@ OR
   ```bash
   git clone https://github.com/chanfork/ytdl-gy.git
   docker build -t <the_img_name> .
-  docker run --name <the_container_name> -it -v <the_local_empty_dire>:/home/ytdl-gy <the_img_name>
-  # user should mount a local EMPTY directory to /home/ytdl-gy, so the source code will be installed(clone) into it.
+  docker run --name <the_container_name> -it -v <the_local_directory>:/home/ytdl-gy <the_img_name>
   ```
 
 
@@ -36,5 +35,12 @@ OR
   'v.com/ep'
   'm/video/'
   ```
-  
+
+
+## Update
+
+- step 1 : Delete file  `ytdl-gy.py` which in local mounted directory.
+
+- step 2 : Start (or restart) existing container, or creat new container.
+
   
