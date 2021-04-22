@@ -22,4 +22,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 	
 #ENTRYPOINT
 
-CMD ["/bin/bash","-c","git clone https://github.com/chanfork/ytdl-gy.git /home/ytdl-gy && cd /home/ytdl-gy && bash"]
+CMD ["/bin/bash","-c","cd /home/ytdl-gy && test -f ytdl-gy.py && bash || { git clone https://github.com/chanfork/ytdl-gy.git /tmp/ytdl-gy; cp /tmp/ytdl-gy/ytdl-gy.py /home/ytdl-gy/; rm -r /tmp/ytdl-gy; bash; }"]
