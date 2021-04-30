@@ -1,0 +1,96 @@
+kind: pipeline
+type: docker
+name: ytdlgy_default
+ 
+platform:
+  os: linux
+  arch: arm
+
+# workspace:
+#   path: /drone/src
+
+# clone:
+#   disable: true
+
+steps:
+- name: main_test
+  image: ytdl-gy
+  pull: never 
+  commands:
+  - mkdir main_test && cp ytdl-gy.py ./main_test/ytdl-gy.py && cd main_test   
+  - echo "$(python ytdl-gy.py $${TEST_URL_1} --dry --save-meta 2>&1)" > result.txt  
+  - echo "$(python ytdl-gy.py $${TEST_URL_2} --dry --save-meta 2>&1)" >> result.txt 
+  - cat result.txt
+  environment:
+    TEST_URL_1:
+      from_secret: test_url_1
+    TEST_URL_2:
+      from_secret: test_url_2  
+  when:
+    event:
+      exclude:
+      - tag    
+
+- name: create_changelog
+  image: naorlivne/drone-github-changelog-generator
+  pull: if-not-exists 
+  settings:
+    github_user: chanfork
+    github_project: ytdl-gy
+    output_path: CHANGELOG.md
+  when:
+    event:
+      - tag
+
+- name: push_changelog_to_current_repo
+  image: appleboy/drone-git-push
+  pull: if-not-exists 
+  settings:
+    remote: git@github.com:chanfork/ytdl-gy.git
+    remote_name: origin_drone
+    branch: main
+    local_ref: main
+    force: false
+    commit: true
+    commit_message: "auto update changelog [CI SKIP]"
+    author_name: chanfork
+    author_email: chanfork@gmail.com
+    ssh_key: 
+      from_secret: git_push_ssh_key
+  when:
+    event:
+      - tag     
+
+- name: catch_file_to_my_volumes
+  image: ytdl-gy
+  pull: never 
+  volumes:
+  - name: my_volumes
+    path: /home/ytdl-gy
+  commands:
+  - cp ytdl-gy.py /home/ytdl-gy/ytdl-gy.py
+  - test -f CHANGELOG.md && cp CHANGELOG.md /home/ytdl-gy/CHANGELOG.md
+  - test -f main_test/result.txt && cp main_test/result.txt /home/ytdl-gy/$(date +"%Y%m%d%H%M").log
+  when:
+    status:
+    - success
+    - failure 
+
+volumes: 
+- name: my_volumes
+  host:
+    path: /home/pi/Desktop/drone/host_volumes/ytdlgy    
+# the second temp volumes
+#- name: my_volumes_temp
+#  temp: {}    
+
+trigger:
+  branch:
+    - main
+    - features/*   
+  event:
+    - push
+    - pull_request
+    - cron
+  cron:
+    - weekly
