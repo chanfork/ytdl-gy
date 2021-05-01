@@ -68,9 +68,7 @@ steps:
   - name: my_volumes
     path: /home/ytdl-gy
   commands:
-  - cp ytdl-gy.py /home/ytdl-gy/ytdl-gy.py
-  - test -f CHANGELOG.md && cp CHANGELOG.md /home/ytdl-gy/CHANGELOG.md
-  - test -f ./main_test/result.txt && cp ./main_test/result.txt /home/ytdl-gy/"$(date +"%Y%m%d%H%M")".log
+  - bash /home/ytdl-gy/catch_file.sh
   when:
     status:
     - success
