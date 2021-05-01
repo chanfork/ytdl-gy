@@ -64,6 +64,7 @@ def get_bs_html(url):
     return html
 
 def get_m3u8_luanch_url(m3u8_url):
+    if 'http' not in m3u8_url: return m3u8_url
     req = urllib.request.Request(m3u8_url,headers=headers)    
     with urllib.request.urlopen(req) as response:
        m3u8 = response.read().decode('utf8').split('\n')
@@ -73,6 +74,7 @@ def get_m3u8_luanch_url(m3u8_url):
     return m3u8_luanch_url
 
 def get_m3u8_vresolution(m3u8_url):
+    if 'http' not in m3u8_url: return '-'  
     req = urllib.request.Request(m3u8_url,headers=headers)       
     with urllib.request.urlopen(req) as response:
        m3u8 = response.read().decode('utf8').split('\n')
@@ -86,7 +88,8 @@ def get_dl_directory(video_data_summarize,creat=False):
 
 def call_ytdl_do_job(url, save_directory, file_name='default', ytdl_path=os.path.join(os.getcwd(),'youtube-dl.exe')):
     # see https://github.com/ytdl-org/youtube-dl#output-template
-    file_name = file_name+'.%(ext)s' if file_name != 'default' else '%(title)s-%(id)s.%(ext)s'        
+    file_name = file_name+'.%(ext)s' if file_name != 'default' else '%(title)s-%(id)s.%(ext)s' 
+    file_name = file_name+'.mp4' if file_name.endswith('.aspx') else file_name      
     ytdl_path = 'youtube-dl' if sys.platform.startswith('linux') else ytdl_path        
     cmd = [ytdl_path, '--user-agent', headers['User-Agent'], '-o', file_name, url]
     sp.run(cmd, cwd=save_directory, text=True,
@@ -156,10 +159,20 @@ class VideoDataS1(object):
     def get_summarize(self): 
         vsource = self.find_vsource_data()
         self.summarize = self.find_vmeta_data()
-        self.summarize['m3u8_url'] = vsource['url']  
+        self.summarize['m3u8_url'] = vsource['url']
         self.summarize['m3u8_next_url'] = vsource['url_next'] 
         self.summarize['m3u8_luanch_url'] = get_m3u8_luanch_url(vsource['url'])
         self.summarize['m3u8_vresolution'] = get_m3u8_vresolution(vsource['url'])
+        
+        if 'http' not in vsource['url']:
+            new_url = self.url_domain_name+'/player/ana.php?url='+vsource['url']
+            new_bs_html = get_bs_html(new_url)
+            target = new_bs_html.find("iframe", {"class":'iframeStyle'})
+            target_src = target['src']
+            target_m3u8 = target_src.split('&groupid=')[0].replace(self.url_domain_name+'/player/?url=','')
+            # print (target_m3u8)
+            self.summarize['m3u8_luanch_url'] = target_m3u8
+            
         return self.summarize     
                 
     @property 
